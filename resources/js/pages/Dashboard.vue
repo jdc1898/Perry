@@ -130,7 +130,7 @@ const checkLabels: Record<string, string> = {
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <div v-if="agent.last_report" class="hidden gap-1 sm:flex">
+                                    <div v-if="agent.is_online && agent.last_report" class="hidden gap-1 sm:flex">
                                         <span
                                             v-for="check in agent.last_report.checks.filter(c => c.status !== 'unknown')"
                                             :key="check.name"
