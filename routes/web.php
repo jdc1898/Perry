@@ -1,12 +1,14 @@
 <?php
 
 use App\Http\Controllers\AgentController;
+use App\Http\Controllers\BinaryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InstallScriptController;
 use Illuminate\Support\Facades\Route;
 
-// Publicly served install script — no auth required
+// Publicly served files — no auth required
 Route::get('/install.sh', InstallScriptController::class)->name('install-script');
+Route::get('/perry', [BinaryController::class, 'download'])->name('perry.download');
 
 Route::inertia('/', 'Welcome')->name('home');
 
