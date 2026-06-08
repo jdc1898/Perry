@@ -11,6 +11,7 @@ class Agent extends Model
     use HasUuids;
 
     protected $fillable = [
+        'id',
         'name',
         'hostname',
         'public_key',

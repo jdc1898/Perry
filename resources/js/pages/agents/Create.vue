@@ -19,6 +19,7 @@ defineOptions({
 const props = defineProps<{ appUrl: string }>();
 
 const form = useForm({
+    id: '',
     name: '',
     public_key: '',
     fingerprint: '',
@@ -64,6 +65,19 @@ function submit() {
                 </CardHeader>
                 <CardContent>
                     <form @submit.prevent="submit" class="space-y-5">
+                        <div class="space-y-1.5">
+                            <Label for="id">Agent ID</Label>
+                            <Input
+                                id="id"
+                                v-model="form.id"
+                                placeholder="UUID from monitoring-agent fingerprint"
+                                :class="{ 'border-destructive': form.errors.id }"
+                                required
+                            />
+                            <p v-if="form.errors.id" class="text-xs text-destructive">{{ form.errors.id }}</p>
+                            <p class="text-xs text-muted-foreground">The "Agent ID" line from <code>monitoring-agent fingerprint</code></p>
+                        </div>
+
                         <div class="space-y-1.5">
                             <Label for="name">Agent Name</Label>
                             <Input

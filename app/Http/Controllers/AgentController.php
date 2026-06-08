@@ -31,6 +31,7 @@ class AgentController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
+            'id'          => ['required', 'uuid', Rule::unique('agents', 'id')],
             'name'        => ['required', 'string', 'max:100'],
             'public_key'  => ['required', 'string'],
             'fingerprint' => ['required', 'string', Rule::unique('agents', 'fingerprint')],
