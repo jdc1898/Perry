@@ -70,7 +70,7 @@ ensure_go() {
 fetch_source() {
   local tmp
   tmp="$(mktemp -d)"
-  info "cloning perry-agent source from GitHub"
+  info "cloning perry-agent source from GitHub" >&2
   command -v git &>/dev/null || err "git is required to build from source"
   git clone --depth=1 "$REPO_URL" "$tmp/perry-agent" >/dev/null 2>&1
   echo "$tmp/perry-agent"
