@@ -247,7 +247,7 @@ function sortedChecks(checks: AgentReport['checks']) {
                                 <CardDescription>Monitor PHP-FPM process and pool status</CardDescription>
                             </div>
                             <div class="flex items-center gap-2">
-                                <Checkbox id="php_enabled" v-model:checked="configForm.php_config.enabled" />
+                                <Checkbox id="php_enabled" v-model="configForm.php_config.enabled" />
                                 <Label for="php_enabled" class="cursor-pointer">Enabled</Label>
                             </div>
                         </div>
@@ -275,7 +275,7 @@ function sortedChecks(checks: AgentReport['checks']) {
                                 <CardDescription>Monitor MySQL connectivity and health</CardDescription>
                             </div>
                             <div class="flex items-center gap-2">
-                                <Checkbox id="mysql_enabled" v-model:checked="configForm.mysql_config.enabled" />
+                                <Checkbox id="mysql_enabled" v-model="configForm.mysql_config.enabled" />
                                 <Label for="mysql_enabled" class="cursor-pointer">Enabled</Label>
                             </div>
                         </div>
@@ -287,7 +287,7 @@ function sortedChecks(checks: AgentReport['checks']) {
                             <p class="text-xs text-muted-foreground">Go MySQL DSN format. Use a read-only monitoring user.</p>
                         </div>
                         <div class="flex items-center gap-2">
-                            <Checkbox id="check_replication" v-model:checked="configForm.mysql_config.check_replication" />
+                            <Checkbox id="check_replication" v-model="configForm.mysql_config.check_replication" />
                             <Label for="check_replication" class="cursor-pointer">Check replication status</Label>
                         </div>
                     </CardContent>
@@ -302,7 +302,7 @@ function sortedChecks(checks: AgentReport['checks']) {
                                 <CardDescription>Monitor the Reverb WebSocket server</CardDescription>
                             </div>
                             <div class="flex items-center gap-2">
-                                <Checkbox id="reverb_enabled" v-model:checked="configForm.reverb_config.enabled" />
+                                <Checkbox id="reverb_enabled" v-model="configForm.reverb_config.enabled" />
                                 <Label for="reverb_enabled" class="cursor-pointer">Enabled</Label>
                             </div>
                         </div>
@@ -330,7 +330,7 @@ function sortedChecks(checks: AgentReport['checks']) {
                                 <CardDescription>Monitor Redis connectivity and memory usage</CardDescription>
                             </div>
                             <div class="flex items-center gap-2">
-                                <Checkbox id="redis_enabled" v-model:checked="configForm.redis_config.enabled" />
+                                <Checkbox id="redis_enabled" v-model="configForm.redis_config.enabled" />
                                 <Label for="redis_enabled" class="cursor-pointer">Enabled</Label>
                             </div>
                         </div>
