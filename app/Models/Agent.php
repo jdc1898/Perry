@@ -25,6 +25,7 @@ class Agent extends Model
         'config_poll_interval',
         'config_version',
         'last_seen_at',
+        'alerted_offline_at',
     ];
 
     protected $casts = [
@@ -32,7 +33,8 @@ class Agent extends Model
         'mysql_config'  => 'array',
         'reverb_config' => 'array',
         'redis_config'  => 'array',
-        'last_seen_at'  => 'datetime',
+        'last_seen_at'         => 'datetime',
+        'alerted_offline_at'   => 'datetime',
     ];
 
     public function reports(): HasMany

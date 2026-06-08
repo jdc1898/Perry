@@ -14,8 +14,11 @@
         "laravel/chisel": "^0.1.0",
         "laravel/fortify": "^1.37.2",
         "laravel/framework": "^13.7",
+        "laravel/slack-notification-channel": "^3.8",
         "laravel/tinker": "^3.0",
-        "laravel/wayfinder": "^0.1.14"
+        "laravel/wayfinder": "^0.1.14",
+        "symfony/http-client": "^8.1",
+        "symfony/mailgun-mailer": "^8.1"
     },
     "require-dev": {
         "fakerphp/faker": "^1.24",
