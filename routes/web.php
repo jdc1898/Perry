@@ -2,7 +2,11 @@
 
 use App\Http\Controllers\AgentController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\InstallScriptController;
 use Illuminate\Support\Facades\Route;
+
+// Publicly served install script — no auth required
+Route::get('/install.sh', InstallScriptController::class)->name('install-script');
 
 Route::inertia('/', 'Welcome')->name('home');
 

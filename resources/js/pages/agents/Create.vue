@@ -48,7 +48,7 @@ function submit() {
                 </CardHeader>
                 <CardContent class="space-y-2 text-sm text-muted-foreground">
                     <p>SSH into your server and run:</p>
-                    <pre class="rounded-md bg-muted px-4 py-3 text-xs font-mono overflow-x-auto">curl -fsSL https://your-server/install.sh | sudo bash -s {{ props.appUrl }}</pre>
+                    <pre class="rounded-md bg-muted px-4 py-3 text-xs font-mono overflow-x-auto">curl -fsSL {{ props.appUrl }}/install.sh | sudo bash -s {{ props.appUrl }}</pre>
                     <p class="pt-1">Then get your credentials with:</p>
                     <pre class="rounded-md bg-muted px-4 py-3 text-xs font-mono">sudo monitoring-agent fingerprint</pre>
                 </CardContent>
