@@ -38,7 +38,7 @@ class AgentController extends Controller
 
         $agent = Agent::create($data);
 
-        return redirect()->route('agents.show', $agent)
+        return redirect()->route('agents.index')
             ->with('flash', ['type' => 'success', 'message' => 'Agent registered successfully.']);
     }
 
