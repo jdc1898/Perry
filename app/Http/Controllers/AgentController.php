@@ -97,10 +97,12 @@ class AgentController extends Controller
             'name'                 => ['required', 'string', 'max:100'],
             'check_interval'       => ['required', 'integer', 'min:10', 'max:3600'],
             'config_poll_interval' => ['required', 'integer', 'min:60', 'max:3600'],
+            'auto_update'          => ['boolean'],
             'php_config'           => ['nullable', 'array'],
             'mysql_config'         => ['nullable', 'array'],
             'reverb_config'        => ['nullable', 'array'],
             'redis_config'         => ['nullable', 'array'],
+            'system_config'        => ['nullable', 'array'],
         ]);
 
         $agent->update(array_merge($data, [
@@ -156,6 +158,7 @@ class AgentController extends Controller
             'check_interval'       => $agent->check_interval,
             'config_poll_interval' => $agent->config_poll_interval,
             'config_version'       => $agent->config_version,
+            'auto_update'          => (bool) $agent->auto_update,
             'php_config'           => $agent->php_config    ?? ['enabled' => false, 'fpm_socket' => '', 'status_url' => ''],
             'mysql_config'         => $agent->mysql_config  ?? ['enabled' => false, 'dsn' => '', 'check_replication' => false],
             'reverb_config'        => $agent->reverb_config ?? ['enabled' => false, 'host' => '127.0.0.1', 'port' => 8080],

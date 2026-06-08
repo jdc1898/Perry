@@ -25,7 +25,9 @@ class BinaryController extends Controller
 
     public function edit(): Response
     {
-        $exists = Storage::disk(self::DISK)->exists(self::FILE);
+        $exists   = Storage::disk(self::DISK)->exists(self::FILE);
+        $hashPath = Storage::disk(self::DISK)->path(self::FILE . '.sha256');
+        $hash     = ($exists && file_exists($hashPath)) ? trim(file_get_contents($hashPath)) : null;
 
         return Inertia::render('settings/Binary', [
             'binary' => [
@@ -34,6 +36,7 @@ class BinaryController extends Controller
                 'modified_at' => $exists
                     ? date('Y-m-d H:i:s', Storage::disk(self::DISK)->lastModified(self::FILE))
                     : null,
+                'hash'        => $hash,
             ],
         ]);
     }
@@ -44,7 +47,11 @@ class BinaryController extends Controller
             'binary' => ['required', 'file', 'max:102400'], // 100 MB max
         ]);
 
-        Storage::disk(self::DISK)->put(self::FILE, $request->file('binary')->getContent());
+        $content = $request->file('binary')->getContent();
+        $hash    = hash('sha256', $content);
+
+        Storage::disk(self::DISK)->put(self::FILE, $content);
+        Storage::disk(self::DISK)->put(self::FILE . '.sha256', $hash);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Agent binary uploaded.']);
 

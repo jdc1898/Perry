@@ -31,6 +31,7 @@ const configForm = useForm({
     name:                 props.agent.name,
     check_interval:       props.agent.check_interval,
     config_poll_interval: props.agent.config_poll_interval,
+    auto_update:          props.agent.auto_update,
     php_config:           { ...props.agent.php_config },
     mysql_config:         { ...props.agent.mysql_config },
     reverb_config:        { ...props.agent.reverb_config },
@@ -236,6 +237,25 @@ function hasAnyData(timeline: AgentTimelineDay[]): boolean {
                             </div>
                         </div>
                     </CardContent>
+                </Card>
+
+                <!-- Auto-update -->
+                <Card>
+                    <CardHeader>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <CardTitle class="text-base">Auto-update</CardTitle>
+                                <CardDescription>
+                                    Agent will automatically apply new binaries uploaded to
+                                    <span class="font-mono text-xs">Settings → Agent Binary</span>
+                                </CardDescription>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox id="auto_update" v-model="configForm.auto_update" />
+                                <Label for="auto_update" class="cursor-pointer">Enabled</Label>
+                            </div>
+                        </div>
+                    </CardHeader>
                 </Card>
 
                 <!-- PHP -->

@@ -11,6 +11,7 @@ const props = defineProps<{
         exists: boolean;
         size: number | null;
         modified_at: string | null;
+        hash: string | null;
     };
 }>();
 
@@ -67,6 +68,9 @@ function formatSize(bytes: number): string {
                         <span class="text-muted-foreground">{{ formatSize(binary.size!) }}</span>
                     </div>
                     <div class="mt-1 text-xs text-muted-foreground">Last updated {{ binary.modified_at }}</div>
+                    <div v-if="binary.hash" class="mt-1 font-mono text-xs text-muted-foreground/60 break-all">
+                        SHA-256: {{ binary.hash }}
+                    </div>
                 </div>
                 <p v-else class="text-sm text-muted-foreground">
                     No binary uploaded yet. Agents will receive a 404 until a binary is uploaded.
