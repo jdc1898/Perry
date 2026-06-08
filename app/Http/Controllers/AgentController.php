@@ -23,7 +23,9 @@ class AgentController extends Controller
 
     public function create(): Response
     {
-        return Inertia::render('agents/Create');
+        return Inertia::render('agents/Create', [
+            'appUrl' => config('app.url'),
+        ]);
     }
 
     public function store(Request $request): RedirectResponse

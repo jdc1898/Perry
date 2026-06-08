@@ -16,6 +16,8 @@ defineOptions({
     },
 });
 
+const props = defineProps<{ appUrl: string }>();
+
 const form = useForm({
     name: '',
     public_key: '',
@@ -46,7 +48,7 @@ function submit() {
                 </CardHeader>
                 <CardContent class="space-y-2 text-sm text-muted-foreground">
                     <p>SSH into your server and run:</p>
-                    <pre class="rounded-md bg-muted px-4 py-3 text-xs font-mono overflow-x-auto">curl -fsSL https://your-server/install.sh | sudo bash -s https://{{ $page.props.ziggy?.url ?? window?.location?.origin ?? 'your-management-url.com' }}</pre>
+                    <pre class="rounded-md bg-muted px-4 py-3 text-xs font-mono overflow-x-auto">curl -fsSL https://your-server/install.sh | sudo bash -s {{ props.appUrl }}</pre>
                     <p class="pt-1">Then get your credentials with:</p>
                     <pre class="rounded-md bg-muted px-4 py-3 text-xs font-mono">sudo monitoring-agent fingerprint</pre>
                 </CardContent>
