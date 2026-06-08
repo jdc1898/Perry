@@ -29,11 +29,10 @@ class AgentReport extends Model
 
     public function overallStatus(): string
     {
-        $statuses = $this->checkResults->pluck('status');
+        $statuses = $this->checkResults->pluck('status')->filter(fn ($s) => $s !== 'unknown');
 
         if ($statuses->contains('critical')) return 'critical';
         if ($statuses->contains('warning'))  return 'warning';
-        if ($statuses->contains('unknown'))  return 'unknown';
 
         return 'ok';
     }

@@ -121,7 +121,7 @@ const checkLabels: Record<string, string> = {
                                 class="flex items-center justify-between p-4 hover:bg-muted/40 transition-colors"
                             >
                                 <div class="flex items-center gap-3">
-                                    <div :class="['size-2 rounded-full flex-shrink-0', agent.is_online ? 'bg-emerald-500' : 'bg-zinc-300 dark:bg-zinc-600']" />
+                                    <div :class="['size-2 rounded-full flex-shrink-0', agent.is_online ? 'bg-emerald-500' : 'bg-red-500']" />
                                     <div>
                                         <div class="text-sm font-medium">{{ agent.name }}</div>
                                         <div class="text-xs text-muted-foreground">
