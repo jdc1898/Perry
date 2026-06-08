@@ -23,15 +23,37 @@ class DashboardController extends Controller
             'online'   => $agents->filter(fn (Agent $a) => $a->isOnline())->count(),
         ];
 
+        $since24h = now()->subHours(24);
+
         // Last report per agent with overall status
         $agentStatuses = Agent::where('status', '!=', 'revoked')
             ->orderBy('name')
             ->get()
-            ->map(function (Agent $agent) {
+            ->map(function (Agent $agent) use ($since24h) {
                 $lastReport = AgentReport::where('agent_id', $agent->id)
                     ->with('checkResults')
                     ->orderByDesc('reported_at')
                     ->first();
+
+                // 24h uptime: 288 five-minute slots
+                $reports24h = AgentReport::where('agent_id', $agent->id)
+                    ->with('checkResults:report_id,status')
+                    ->where('reported_at', '>=', $since24h)
+                    ->select(['id', 'reported_at'])
+                    ->orderBy('reported_at')
+                    ->get();
+
+                $slots = array_fill(0, 288, null);
+                foreach ($reports24h as $report) {
+                    $minutesAgo = $since24h->diffInMinutes($report->reported_at);
+                    $slot       = (int) floor($minutesAgo / 5);
+                    if ($slot < 0 || $slot >= 288) continue;
+                    $status = $report->overallStatus();
+                    $order  = ['critical' => 3, 'warning' => 2, 'ok' => 0];
+                    if ($slots[$slot] === null || ($order[$status] ?? 0) > ($order[$slots[$slot]] ?? 0)) {
+                        $slots[$slot] = $status;
+                    }
+                }
 
                 return [
                     'id'           => $agent->id,
@@ -40,6 +62,7 @@ class DashboardController extends Controller
                     'status'       => $agent->status,
                     'is_online'    => $agent->isOnline(),
                     'last_seen_at' => $agent->last_seen_at,
+                    'uptime_24h'   => $slots,
                     'last_report'  => $lastReport ? [
                         'status' => $lastReport->overallStatus(),
                         'checks' => $lastReport->checkResults->map(fn ($c) => [

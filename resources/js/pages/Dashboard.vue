@@ -129,7 +129,21 @@ const checkLabels: Record<string, string> = {
                                         </div>
                                     </div>
                                 </div>
-                                <div class="flex items-center gap-2">
+                                <div class="flex items-center gap-3 min-w-0 flex-1 justify-end">
+                                    <!-- 24h uptime bars -->
+                                    <div class="hidden md:flex items-end gap-px h-6 w-36 flex-shrink-0">
+                                        <div
+                                            v-for="(slot, i) in agent.uptime_24h"
+                                            :key="i"
+                                            class="flex-1 rounded-sm"
+                                            :class="
+                                                slot === 'ok'       ? 'bg-emerald-500 h-full' :
+                                                slot === 'warning'  ? 'bg-amber-400 h-full' :
+                                                slot === 'critical' ? 'bg-red-500 h-full' :
+                                                                      'bg-muted h-3/5'
+                                            "
+                                        />
+                                    </div>
                                     <div v-if="agent.is_online && agent.last_report" class="hidden gap-1 sm:flex">
                                         <span
                                             v-for="check in agent.last_report.checks.filter(c => c.status !== 'unknown')"
