@@ -51,7 +51,7 @@ function submit() {
                     <p>SSH into your server and run:</p>
                     <pre class="rounded-md bg-muted px-4 py-3 text-xs font-mono overflow-x-auto">curl -fsSL {{ props.appUrl }}/install.sh | sudo bash -s {{ props.appUrl }}</pre>
                     <p class="pt-1">Then get your credentials with:</p>
-                    <pre class="rounded-md bg-muted px-4 py-3 text-xs font-mono">sudo monitoring-agent fingerprint</pre>
+                    <pre class="rounded-md bg-muted px-4 py-3 text-xs font-mono">sudo perry fingerprint</pre>
                 </CardContent>
             </Card>
 
@@ -60,7 +60,7 @@ function submit() {
                 <CardHeader>
                     <CardTitle class="text-base">Step 2 — Register the agent here</CardTitle>
                     <CardDescription>
-                        Paste the output from <code class="text-xs bg-muted px-1 py-0.5 rounded">monitoring-agent fingerprint</code>
+                        Paste the output from <code class="text-xs bg-muted px-1 py-0.5 rounded">perry fingerprint</code>
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -70,12 +70,12 @@ function submit() {
                             <Input
                                 id="id"
                                 v-model="form.id"
-                                placeholder="UUID from monitoring-agent fingerprint"
+                                placeholder="UUID from perry fingerprint"
                                 :class="{ 'border-destructive': form.errors.id }"
                                 required
                             />
                             <p v-if="form.errors.id" class="text-xs text-destructive">{{ form.errors.id }}</p>
-                            <p class="text-xs text-muted-foreground">The "Agent ID" line from <code>monitoring-agent fingerprint</code></p>
+                            <p class="text-xs text-muted-foreground">The "Agent ID" line from <code>perry fingerprint</code></p>
                         </div>
 
                         <div class="space-y-1.5">
@@ -100,7 +100,7 @@ function submit() {
                                 required
                             />
                             <p v-if="form.errors.public_key" class="text-xs text-destructive">{{ form.errors.public_key }}</p>
-                            <p class="text-xs text-muted-foreground">The "Public Key" line from <code>monitoring-agent fingerprint</code></p>
+                            <p class="text-xs text-muted-foreground">The "Public Key" line from <code>perry fingerprint</code></p>
                         </div>
 
                         <div class="space-y-1.5">
@@ -113,7 +113,7 @@ function submit() {
                                 required
                             />
                             <p v-if="form.errors.fingerprint" class="text-xs text-destructive">{{ form.errors.fingerprint }}</p>
-                            <p class="text-xs text-muted-foreground">The "Fingerprint" line from <code>monitoring-agent fingerprint</code></p>
+                            <p class="text-xs text-muted-foreground">The "Fingerprint" line from <code>perry fingerprint</code></p>
                         </div>
 
                         <div class="flex items-center gap-3 pt-2">
