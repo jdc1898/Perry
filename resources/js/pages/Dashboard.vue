@@ -146,8 +146,6 @@ const checkLabels: Record<string, string> = {
                                             {{ check.name }}
                                         </span>
                                     </div>
-                                    <StatusBadge v-if="agent.last_report" :status="agent.last_report.status" size="sm" />
-                                    <StatusBadge v-else :status="agent.status" size="sm" />
                                 </div>
                             </Link>
                         </div>
