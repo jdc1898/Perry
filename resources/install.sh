@@ -92,7 +92,7 @@ build_from_source() {
 
   info "building monitoring-agent"
   pushd "$src_dir" >/dev/null
-  go mod download
+  go mod tidy
   go build -o "$BINARY_PATH" ./cmd/agent/
   popd >/dev/null
   info "build complete"
