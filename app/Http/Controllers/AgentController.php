@@ -38,8 +38,9 @@ class AgentController extends Controller
 
         $agent = Agent::create($data);
 
-        return redirect()->route('agents.index')
-            ->with('flash', ['type' => 'success', 'message' => 'Agent registered successfully.']);
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'Agent registered successfully.']);
+
+        return redirect()->route('agents.index');
     }
 
     public function show(Agent $agent): Response
@@ -84,22 +85,27 @@ class AgentController extends Controller
             'config_version' => $agent->config_version + 1,
         ]));
 
-        return back()->with('flash', ['type' => 'success', 'message' => 'Configuration saved.']);
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'Configuration saved.']);
+
+        return back();
     }
 
     public function revoke(Agent $agent): RedirectResponse
     {
         $agent->update(['status' => 'revoked']);
 
-        return back()->with('flash', ['type' => 'success', 'message' => 'Agent revoked.']);
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'Agent revoked.']);
+
+        return back();
     }
 
     public function destroy(Agent $agent): RedirectResponse
     {
         $agent->delete();
 
-        return redirect()->route('agents.index')
-            ->with('flash', ['type' => 'success', 'message' => 'Agent deleted.']);
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'Agent deleted.']);
+
+        return redirect()->route('agents.index');
     }
 
     private function agentSummary(Agent $agent): array

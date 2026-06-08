@@ -11,6 +11,6 @@ export function initializeFlashToast(): void {
             return;
         }
 
-        toast[data.type](data.message);
+        setTimeout(() => toast[data.type](data.message), 0);
     });
 }
