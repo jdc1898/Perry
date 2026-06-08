@@ -132,7 +132,7 @@ const checkLabels: Record<string, string> = {
                                 <div class="flex items-center gap-2">
                                     <div v-if="agent.last_report" class="hidden gap-1 sm:flex">
                                         <span
-                                            v-for="check in agent.last_report.checks"
+                                            v-for="check in agent.last_report.checks.filter(c => c.status !== 'unknown')"
                                             :key="check.name"
                                             :title="`${check.name}: ${check.message}`"
                                             :class="[
