@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, router, useForm } from '@inertiajs/vue3';
-import { ChevronDown, ChevronUp, Settings, Trash2, XCircle } from '@lucide/vue';
+import { Settings, Trash2, XCircle } from '@lucide/vue';
 import { ref } from 'vue';
 import StatusBadge from '@/components/StatusBadge.vue';
 import { Button } from '@/components/ui/button';
@@ -8,9 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
 import { dashboard } from '@/routes';
-import type { Agent, AgentReport } from '@/types/agents';
+import type { Agent, AgentTimelineDay, CheckStatus } from '@/types/agents';
 
 defineOptions({
     layout: {
@@ -23,11 +22,10 @@ defineOptions({
 
 const props = defineProps<{
     agent: Agent;
-    reports: AgentReport[];
+    timeline: AgentTimelineDay[];
 }>();
 
 const activeTab = ref<'reports' | 'config'>('reports');
-const expandedReport = ref<number | null>(null);
 
 const configForm = useForm({
     name:                 props.agent.name,
@@ -66,13 +64,37 @@ function timeAgo(date: string | null): string {
     return `${Math.floor(hrs / 24)}d ago`;
 }
 
-function formatDate(date: string): string {
-    return new Date(date).toLocaleString();
+function slotToTime(slot: number): string {
+    const h = Math.floor((slot * 5) / 60).toString().padStart(2, '0');
+    const m = ((slot * 5) % 60).toString().padStart(2, '0');
+    return `${h}:${m}`;
 }
 
-const statusOrder = ['critical', 'warning', 'unknown', 'ok'];
-function sortedChecks(checks: AgentReport['checks']) {
-    return [...checks].sort((a, b) => statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status));
+function formatDayLabel(date: string): string {
+    const [year, month, day] = date.split('-').map(Number);
+    const today = new Date();
+    if (year === today.getFullYear() && month === today.getMonth() + 1 && day === today.getDate()) {
+        return 'today';
+    }
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    if (year === yesterday.getFullYear() && month === yesterday.getMonth() + 1 && day === yesterday.getDate()) {
+        return 'yest.';
+    }
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return `${months[month - 1]} ${String(day).padStart(2, ' ')}`;
+}
+
+function slotColor(status: CheckStatus | null): string {
+    if (status === 'ok')       return 'bg-emerald-500 dark:bg-emerald-600';
+    if (status === 'critical') return 'bg-red-500';
+    if (status === 'warning')  return 'bg-amber-400';
+    if (status === 'unknown')  return 'bg-zinc-400 dark:bg-zinc-600';
+    return 'bg-zinc-100 dark:bg-zinc-800';
+}
+
+function hasAnyData(timeline: AgentTimelineDay[]): boolean {
+    return timeline.some(day => day.slots.some(s => s !== null));
 }
 </script>
 
@@ -141,71 +163,49 @@ function sortedChecks(checks: AgentReport['checks']) {
 
         <!-- Reports Tab -->
         <div v-if="activeTab === 'reports'">
-            <div v-if="reports.length === 0" class="py-12 text-center text-sm text-muted-foreground">
+            <div v-if="!hasAnyData(timeline)" class="py-12 text-center text-sm text-muted-foreground">
                 No reports yet. The agent will send its first report after it connects and is registered.
             </div>
-            <div v-else class="space-y-2">
-                <Card
-                    v-for="report in reports"
-                    :key="report.id"
-                    class="overflow-hidden"
-                >
-                    <!-- Report header (always visible) -->
-                    <button
-                        class="w-full flex items-center justify-between p-4 text-left hover:bg-muted/30 transition-colors"
-                        @click="expandedReport = expandedReport === report.id ? null : report.id"
-                    >
-                        <div class="flex items-center gap-3">
-                            <StatusBadge :status="report.status" />
-                            <span class="text-sm text-muted-foreground">{{ formatDate(report.reported_at) }}</span>
-                            <!-- Mini check chips -->
-                            <div class="hidden gap-1 sm:flex">
-                                <span
-                                    v-for="check in report.checks"
-                                    :key="check.name"
-                                    :class="[
-                                        'rounded px-1.5 py-0.5 text-xs font-medium uppercase',
-                                        check.status === 'ok'       ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' :
-                                        check.status === 'warning'  ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300' :
-                                        check.status === 'critical' ? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300' :
-                                                                      'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400',
-                                    ]"
-                                >
-                                    {{ check.name }}
-                                </span>
-                            </div>
-                        </div>
-                        <ChevronDown v-if="expandedReport !== report.id" class="size-4 text-muted-foreground" />
-                        <ChevronUp v-else class="size-4 text-muted-foreground" />
-                    </button>
+            <div v-else>
+                <!-- Legend -->
+                <div class="mb-4 flex items-center gap-4 text-xs text-muted-foreground">
+                    <span class="flex items-center gap-1.5"><span class="inline-block size-2.5 rounded-sm bg-emerald-500" /> OK</span>
+                    <span class="flex items-center gap-1.5"><span class="inline-block size-2.5 rounded-sm bg-amber-400" /> Warning</span>
+                    <span class="flex items-center gap-1.5"><span class="inline-block size-2.5 rounded-sm bg-red-500" /> Critical</span>
+                    <span class="flex items-center gap-1.5"><span class="inline-block size-2.5 rounded-sm bg-zinc-400 dark:bg-zinc-600" /> Unknown</span>
+                    <span class="flex items-center gap-1.5"><span class="inline-block size-2.5 rounded-sm bg-zinc-100 dark:bg-zinc-800 border border-border" /> No data</span>
+                </div>
 
-                    <!-- Expanded check details -->
-                    <div v-if="expandedReport === report.id" class="border-t border-border">
-                        <div
-                            v-for="check in sortedChecks(report.checks)"
-                            :key="check.name"
-                            class="flex items-start gap-4 px-4 py-3 border-b border-border/50 last:border-0"
-                        >
-                            <div class="w-20 shrink-0">
-                                <StatusBadge :status="check.status" size="sm" />
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="text-sm font-medium capitalize">{{ check.name }}</div>
-                                <div class="text-xs text-muted-foreground">{{ check.message }}</div>
-                                <!-- Key metrics -->
-                                <div v-if="check.metrics && Object.keys(check.metrics).length" class="mt-2 flex flex-wrap gap-x-4 gap-y-1">
-                                    <span
-                                        v-for="(val, key) in check.metrics"
-                                        :key="key"
-                                        class="text-xs text-muted-foreground"
-                                    >
-                                        <span class="font-medium text-foreground/70">{{ key }}</span>: {{ val }}
-                                    </span>
-                                </div>
-                            </div>
+                <!-- Timeline rows -->
+                <div class="space-y-1.5">
+                    <div
+                        v-for="day in timeline"
+                        :key="day.date"
+                        class="flex items-center gap-3 min-w-0"
+                    >
+                        <div class="w-11 shrink-0 text-right font-mono text-xs text-muted-foreground">
+                            {{ formatDayLabel(day.date) }}
+                        </div>
+                        <div class="flex flex-1 gap-px overflow-hidden rounded-sm min-w-0">
+                            <div
+                                v-for="(status, i) in day.slots"
+                                :key="i"
+                                :class="slotColor(status)"
+                                :title="`${day.date} ${slotToTime(i)} — ${status ?? 'no data'}`"
+                                class="flex-1 h-7 min-w-0"
+                            />
                         </div>
                     </div>
-                </Card>
+                </div>
+
+                <!-- Time axis labels -->
+                <div class="mt-1 flex pl-14 text-xs text-muted-foreground/60">
+                    <span class="flex-1 text-left">00:00</span>
+                    <span class="flex-1 text-center">06:00</span>
+                    <span class="flex-1 text-center">12:00</span>
+                    <span class="flex-1 text-center">18:00</span>
+                    <span class="flex-1 text-right">24:00</span>
+                </div>
             </div>
         </div>
 

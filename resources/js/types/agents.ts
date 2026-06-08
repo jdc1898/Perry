@@ -62,6 +62,11 @@ export interface CheckResult {
     checked_at: string;
 }
 
+export interface AgentTimelineDay {
+    date: string;
+    slots: Array<CheckStatus | null>;
+}
+
 export interface AgentSummary {
     id: string;
     name: string;

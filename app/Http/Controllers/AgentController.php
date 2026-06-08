@@ -46,28 +46,49 @@ class AgentController extends Controller
 
     public function show(Agent $agent): Response
     {
+        $days  = 30;
+        $since = now()->subDays($days - 1)->startOfDay();
+
         $reports = $agent->allReports()
-            ->with('checkResults')
-            ->limit(20)
-            ->get()
-            ->map(fn ($r) => [
-                'id'          => $r->id,
-                'hostname'    => $r->hostname,
-                'reported_at' => $r->reported_at,
-                'status'      => $r->overallStatus(),
-                'checks'      => $r->checkResults->map(fn ($c) => [
-                    'name'       => $c->name,
-                    'status'     => $c->status,
-                    'message'    => $c->message,
-                    'metrics'    => $c->metrics,
-                    'checked_at' => $c->checked_at,
-                ]),
-            ]);
+            ->with(['checkResults:report_id,status'])
+            ->where('reported_at', '>=', $since)
+            ->select(['id', 'reported_at'])
+            ->orderBy('reported_at')
+            ->get();
+
+        // Map reports to date => slot (5-min window) => worst status
+        $byDate = [];
+        foreach ($reports as $report) {
+            $date   = $report->reported_at->toDateString();
+            $slot   = (int) floor(($report->reported_at->hour * 60 + $report->reported_at->minute) / 5);
+            $status = $report->overallStatus();
+
+            $byDate[$date][$slot] = isset($byDate[$date][$slot])
+                ? $this->worstStatus($byDate[$date][$slot], $status)
+                : $status;
+        }
+
+        // Build timeline newest-first, all 30 days
+        $timeline = [];
+        for ($i = 0; $i < $days; $i++) {
+            $date   = now()->subDays($i)->toDateString();
+            $slots  = array_fill(0, 288, null);
+            foreach ($byDate[$date] ?? [] as $slot => $status) {
+                $slots[$slot] = $status;
+            }
+            $timeline[] = ['date' => $date, 'slots' => $slots];
+        }
 
         return Inertia::render('agents/Show', [
-            'agent'   => $this->agentDetail($agent),
-            'reports' => $reports,
+            'agent'    => $this->agentDetail($agent),
+            'timeline' => $timeline,
         ]);
+    }
+
+    private function worstStatus(string $a, string $b): string
+    {
+        $order = ['critical' => 3, 'warning' => 2, 'unknown' => 1, 'ok' => 0];
+        return ($order[$a] ?? 0) >= ($order[$b] ?? 0) ? $a : $b;
     }
 
     public function update(Request $request, Agent $agent): RedirectResponse
