@@ -23,7 +23,7 @@ class DashboardController extends Controller
             'online'   => $agents->filter(fn (Agent $a) => $a->isOnline())->count(),
         ];
 
-        $since24h = now()->subHours(24);
+        $since24h = now()->subHours(4);
 
         // Last report per agent with overall status
         $agentStatuses = Agent::where('status', '!=', 'revoked')
@@ -35,7 +35,7 @@ class DashboardController extends Controller
                     ->orderByDesc('reported_at')
                     ->first();
 
-                // 24h uptime: 288 five-minute slots
+                // 4h uptime: 48 five-minute slots
                 $reports24h = AgentReport::where('agent_id', $agent->id)
                     ->with('checkResults:report_id,status')
                     ->where('reported_at', '>=', $since24h)
@@ -43,11 +43,11 @@ class DashboardController extends Controller
                     ->orderBy('reported_at')
                     ->get();
 
-                $slots = array_fill(0, 288, null);
+                $slots = array_fill(0, 48, null);
                 foreach ($reports24h as $report) {
                     $minutesAgo = $since24h->diffInMinutes($report->reported_at);
                     $slot       = (int) floor($minutesAgo / 5);
-                    if ($slot < 0 || $slot >= 288) continue;
+                    if ($slot < 0 || $slot >= 48) continue;
                     $status = $report->overallStatus();
                     $order  = ['critical' => 3, 'warning' => 2, 'ok' => 0];
                     if ($slots[$slot] === null || ($order[$status] ?? 0) > ($order[$slots[$slot]] ?? 0)) {

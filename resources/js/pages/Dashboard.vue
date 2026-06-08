@@ -147,17 +147,17 @@ const checkLabels: Record<string, string> = {
                                         </span>
                                     </div>
                                 </div>
-                                <!-- 24h uptime bars — full width, 288 × 1px slots -->
-                                <div class="flex items-end h-5 w-full overflow-hidden rounded-sm">
+                                <!-- 4h uptime bars — 48 × 5-min slots, full width -->
+                                <div class="flex items-end gap-px h-5 w-full">
                                     <div
                                         v-for="(slot, i) in agent.uptime_24h"
                                         :key="i"
-                                        style="width:1px;flex-shrink:0"
+                                        class="flex-1 h-full rounded-sm"
                                         :class="
-                                            slot === 'ok'       ? 'bg-emerald-500 h-full' :
-                                            slot === 'warning'  ? 'bg-amber-400 h-full' :
-                                            slot === 'critical' ? 'bg-red-500 h-full' :
-                                                                  'bg-border h-3/5'
+                                            slot === 'ok'       ? 'bg-emerald-500' :
+                                            slot === 'warning'  ? 'bg-amber-400' :
+                                            slot === 'critical' ? 'bg-red-500' :
+                                                                  'bg-border'
                                         "
                                     />
                                 </div>
