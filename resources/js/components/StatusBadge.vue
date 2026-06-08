@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { AgentStatus, CheckStatus } from '@/types/agents';
 
-const props = defineProps<{
+defineProps<{
     status: AgentStatus | CheckStatus | 'online' | 'offline';
     size?: 'sm' | 'md';
 }>();
