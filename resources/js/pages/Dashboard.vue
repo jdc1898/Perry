@@ -118,31 +118,17 @@ const checkLabels: Record<string, string> = {
                                 v-for="agent in agentStatuses"
                                 :key="agent.id"
                                 :href="`/agents/${agent.id}`"
-                                class="flex items-center justify-between p-4 hover:bg-muted/40 transition-colors"
+                                class="flex flex-col gap-2 px-4 pt-4 pb-3 hover:bg-muted/40 transition-colors"
                             >
-                                <div class="flex items-center gap-3">
-                                    <div :class="['size-2 rounded-full flex-shrink-0', agent.is_online ? 'bg-emerald-500' : 'bg-red-500']" />
-                                    <div>
-                                        <div class="text-sm font-medium">{{ agent.name }}</div>
-                                        <div class="text-xs text-muted-foreground">
-                                            {{ agent.hostname ?? 'Not yet connected' }} · {{ timeAgo(agent.last_seen_at) }}
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <div :class="['size-2 rounded-full flex-shrink-0', agent.is_online ? 'bg-emerald-500' : 'bg-red-500']" />
+                                        <div>
+                                            <div class="text-sm font-medium">{{ agent.name }}</div>
+                                            <div class="text-xs text-muted-foreground">
+                                                {{ agent.hostname ?? 'Not yet connected' }} · {{ timeAgo(agent.last_seen_at) }}
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-3 min-w-0 flex-1 justify-end">
-                                    <!-- 24h uptime bars — 288 slots × 1px each -->
-                                    <div class="hidden lg:flex items-end h-6 overflow-hidden flex-1 min-w-0 max-w-xs">
-                                        <div
-                                            v-for="(slot, i) in agent.uptime_24h"
-                                            :key="i"
-                                            style="width:1px;flex-shrink:0"
-                                            :class="
-                                                slot === 'ok'       ? 'bg-emerald-500 h-full' :
-                                                slot === 'warning'  ? 'bg-amber-400 h-full' :
-                                                slot === 'critical' ? 'bg-red-500 h-full' :
-                                                                      'bg-border h-3/5'
-                                            "
-                                        />
                                     </div>
                                     <div v-if="agent.is_online && agent.last_report" class="hidden gap-1 sm:flex">
                                         <span
@@ -160,6 +146,20 @@ const checkLabels: Record<string, string> = {
                                             {{ check.name }}
                                         </span>
                                     </div>
+                                </div>
+                                <!-- 24h uptime bars — full width, 288 × 1px slots -->
+                                <div class="flex items-end h-5 w-full overflow-hidden rounded-sm">
+                                    <div
+                                        v-for="(slot, i) in agent.uptime_24h"
+                                        :key="i"
+                                        style="width:1px;flex-shrink:0"
+                                        :class="
+                                            slot === 'ok'       ? 'bg-emerald-500 h-full' :
+                                            slot === 'warning'  ? 'bg-amber-400 h-full' :
+                                            slot === 'critical' ? 'bg-red-500 h-full' :
+                                                                  'bg-border h-3/5'
+                                        "
+                                    />
                                 </div>
                             </Link>
                         </div>
