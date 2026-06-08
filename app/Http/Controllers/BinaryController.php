@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -56,5 +57,27 @@ class BinaryController extends Controller
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Agent binary uploaded.']);
 
         return to_route('binary.edit');
+    }
+
+    // Called by CI via POST /api/binary with Authorization: Bearer <token>
+    public function apiUpload(Request $request): JsonResponse
+    {
+        $token = config('perry.binary_upload_token');
+
+        if (! $token || $request->bearerToken() !== $token) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $request->validate([
+            'binary' => ['required', 'file', 'max:102400'],
+        ]);
+
+        $content = $request->file('binary')->getContent();
+        $hash    = hash('sha256', $content);
+
+        Storage::disk(self::DISK)->put(self::FILE, $content);
+        Storage::disk(self::DISK)->put(self::FILE . '.sha256', $hash);
+
+        return response()->json(['hash' => $hash]);
     }
 }
