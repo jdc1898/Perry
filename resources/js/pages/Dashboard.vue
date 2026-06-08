@@ -39,6 +39,14 @@ function timeAgo(date: string | null): string {
 const checkLabels: Record<string, string> = {
     php: 'PHP', mysql: 'MySQL', reverb: 'Reverb', redis: 'Redis',
 };
+
+const barTimeLabels: string[] = (() => {
+    const now = new Date();
+    return [4, 3, 2, 1, 0].map(hoursAgo => {
+        const t = new Date(now.getTime() - hoursAgo * 60 * 60 * 1000);
+        return hoursAgo === 0 ? 'Now' : t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    });
+})();
 </script>
 
 <template>
@@ -160,6 +168,9 @@ const checkLabels: Record<string, string> = {
                                                                   'bg-border'
                                         "
                                     />
+                                </div>
+                                <div class="flex justify-between w-full">
+                                    <span v-for="label in barTimeLabels" :key="label" class="text-xs text-muted-foreground">{{ label }}</span>
                                 </div>
                             </Link>
                         </div>
