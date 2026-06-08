@@ -45,7 +45,7 @@ class AgentReportController extends Controller
             }
 
             $agent->update([
-                'last_seen_at' => $reportedAt,
+                'last_seen_at' => now(),
                 'hostname'     => $data['hostname'] ?? $agent->hostname,
             ]);
         });
