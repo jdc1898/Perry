@@ -25,11 +25,13 @@ class DashboardController extends Controller
 
         $since24h = now()->subHours(4);
 
+        $serverBinaryHash = $this->serverBinaryHash();
+
         // Last report per agent with overall status
         $agentStatuses = Agent::where('status', '!=', 'revoked')
             ->orderBy('name')
             ->get()
-            ->map(function (Agent $agent) use ($since24h) {
+            ->map(function (Agent $agent) use ($since24h, $serverBinaryHash) {
                 $lastReport = AgentReport::where('agent_id', $agent->id)
                     ->with('checkResults')
                     ->orderByDesc('reported_at')
@@ -55,15 +57,20 @@ class DashboardController extends Controller
                     }
                 }
 
+                $upgradePending = $serverBinaryHash !== ''
+                    && $agent->reported_binary_hash !== null
+                    && $agent->reported_binary_hash !== $serverBinaryHash;
+
                 return [
-                    'id'           => $agent->id,
-                    'name'         => $agent->name,
-                    'hostname'     => $agent->hostname,
-                    'status'       => $agent->status,
-                    'is_online'    => $agent->isOnline(),
-                    'last_seen_at' => $agent->last_seen_at,
-                    'uptime_24h'   => $slots,
-                    'last_report'  => $lastReport ? [
+                    'id'              => $agent->id,
+                    'name'            => $agent->name,
+                    'hostname'        => $agent->hostname,
+                    'status'          => $agent->status,
+                    'is_online'       => $agent->isOnline(),
+                    'last_seen_at'    => $agent->last_seen_at,
+                    'upgrade_pending' => $upgradePending,
+                    'uptime_24h'      => $slots,
+                    'last_report'     => $lastReport ? [
                         'status' => $lastReport->overallStatus(),
                         'checks' => $lastReport->checkResults->map(fn ($c) => [
                             'name'    => $c->name,
@@ -94,5 +101,11 @@ class DashboardController extends Controller
             'agentStatuses' => $agentStatuses,
             'recentIssues'  => $recentIssues,
         ]);
+    }
+
+    private function serverBinaryHash(): string
+    {
+        $path = \Illuminate\Support\Facades\Storage::disk('local')->path('perry.sha256');
+        return file_exists($path) ? trim(file_get_contents($path)) : '';
     }
 }

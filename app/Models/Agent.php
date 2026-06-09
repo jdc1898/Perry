@@ -27,6 +27,7 @@ class Agent extends Model
         'config_poll_interval',
         'config_version',
         'auto_update',
+        'reported_binary_hash',
         'last_seen_at',
         'alerted_offline_at',
     ];

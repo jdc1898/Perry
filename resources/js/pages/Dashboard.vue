@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { Activity, AlertTriangle, CheckCircle, Server, Wifi } from '@lucide/vue';
+import { Activity, AlertTriangle, ArrowUpCircle, CheckCircle, Server, Wifi } from '@lucide/vue';
 import StatusBadge from '@/components/StatusBadge.vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { dashboard } from '@/routes';
@@ -132,7 +132,17 @@ const barTimeLabels: string[] = (() => {
                                     <div class="flex items-center gap-3">
                                         <div :class="['size-2 rounded-full flex-shrink-0', agent.is_online ? 'bg-emerald-500' : 'bg-red-500']" />
                                         <div>
-                                            <div class="text-sm font-medium">{{ agent.name }}</div>
+                                            <div class="flex items-center gap-1.5">
+                                                <span class="text-sm font-medium">{{ agent.name }}</span>
+                                                <span
+                                                    v-if="agent.upgrade_pending"
+                                                    title="Update available"
+                                                    class="inline-flex items-center gap-0.5 rounded px-1 py-0.5 text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
+                                                >
+                                                    <ArrowUpCircle class="size-3" />
+                                                    update
+                                                </span>
+                                            </div>
                                             <div class="text-xs text-muted-foreground">
                                                 {{ agent.hostname ?? 'Not yet connected' }} · {{ timeAgo(agent.last_seen_at) }}
                                             </div>

@@ -44,10 +44,16 @@ class AgentReportController extends Controller
                 ]);
             }
 
-            $agent->update([
+            $update = [
                 'last_seen_at' => now(),
                 'hostname'     => $data['hostname'] ?? $agent->hostname,
-            ]);
+            ];
+
+            if (! empty($data['binary_hash'])) {
+                $update['reported_binary_hash'] = $data['binary_hash'];
+            }
+
+            $agent->update($update);
         });
 
         return response()->json(['ok' => true], 201);

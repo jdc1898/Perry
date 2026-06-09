@@ -74,6 +74,7 @@ export interface AgentSummary {
     status: AgentStatus;
     is_online: boolean;
     last_seen_at: string | null;
+    upgrade_pending: boolean;
     uptime_24h: Array<CheckStatus | null>;
     last_report: {
         status: CheckStatus;
