@@ -44,11 +44,11 @@ class DashboardController extends Controller
                     ->orderBy('reported_at')
                     ->get();
 
-                $now   = now();
+                $nowTs = now()->timestamp;
                 $slots = array_fill(0, 48, null);
                 foreach ($reports24h as $report) {
-                    $minutesAgo = (int) $now->diffInMinutes($report->reported_at);
-                    $slot       = min(47, max(0, 47 - (int) floor($minutesAgo / 5)));
+                    $secondsAgo = max(0, $nowTs - $report->reported_at->timestamp);
+                    $slot       = min(47, max(0, 47 - (int) floor($secondsAgo / 300)));
                     $status = $report->overallStatus();
                     $order  = ['critical' => 3, 'warning' => 2, 'ok' => 0];
                     if ($slots[$slot] === null || ($order[$status] ?? 0) > ($order[$slots[$slot]] ?? 0)) {
