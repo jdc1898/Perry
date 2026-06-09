@@ -13,7 +13,7 @@ Route::get('/perry', DownloadBinaryController::class)->name('perry.download');
 
 Route::inertia('/', 'Welcome')->name('home');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', ShowDashboardController::class)->name('dashboard');
 
     Route::prefix('agents')->name('agents.')->group(function () {
