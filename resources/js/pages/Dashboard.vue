@@ -42,7 +42,7 @@ const checkLabels: Record<string, string> = {
 
 const barTimeLabels: string[] = (() => {
     const now = new Date();
-    return [4, 3, 2, 1, 0].map(hoursAgo => {
+    return [0, 1, 2, 3, 4].map(hoursAgo => {
         const t = new Date(now.getTime() - hoursAgo * 60 * 60 * 1000);
         return hoursAgo === 0 ? 'Now' : t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
     });
@@ -168,7 +168,7 @@ const barTimeLabels: string[] = (() => {
                                 <!-- 4h uptime bars — 48 × 5-min slots, full width -->
                                 <div class="flex items-end gap-px h-5 w-full">
                                     <div
-                                        v-for="(slot, i) in agent.uptime_24h"
+                                        v-for="(slot, i) in [...agent.uptime_24h].reverse()"
                                         :key="i"
                                         class="flex-1 h-full rounded-sm"
                                         :class="
