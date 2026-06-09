@@ -57,12 +57,15 @@ class AgentController extends Controller
             ->orderBy('reported_at')
             ->get();
 
-        // Map reports to date => slot (5-min window) => worst status, in display timezone
+        $intervalSeconds = max(10, (int) $agent->check_interval);
+        $slotsPerDay = (int) ceil(86400 / $intervalSeconds);
+
+        // Map reports to date => slot => worst status, in display timezone
         $byDate = [];
         foreach ($reports as $report) {
             $local = $report->reported_at->setTimezone($tz);
             $date = $local->toDateString();
-            $slot = (int) floor(($local->hour * 60 + $local->minute) / 5);
+            $slot = (int) floor(($local->hour * 3600 + $local->minute * 60 + $local->second) / $intervalSeconds);
             $status = $report->overallStatus();
 
             $byDate[$date][$slot] = isset($byDate[$date][$slot])
@@ -74,7 +77,7 @@ class AgentController extends Controller
         $timeline = [];
         for ($i = 0; $i < $days; $i++) {
             $date = now($tz)->subDays($i)->toDateString();
-            $slots = array_fill(0, 288, null);
+            $slots = array_fill(0, $slotsPerDay, null);
             foreach ($byDate[$date] ?? [] as $slot => $status) {
                 $slots[$slot] = $status;
             }

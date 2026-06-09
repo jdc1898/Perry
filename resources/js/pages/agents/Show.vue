@@ -84,8 +84,9 @@ function timeAgo(date: string | null): string {
 }
 
 function slotToTime(slot: number): string {
-    const h = Math.floor((slot * 5) / 60).toString().padStart(2, '0');
-    const m = ((slot * 5) % 60).toString().padStart(2, '0');
+    const totalSeconds = slot * props.agent.check_interval;
+    const h = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
+    const m = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
     return `${h}:${m}`;
 }
 
