@@ -68,6 +68,7 @@ class DashboardController extends Controller
                     'is_online'       => $agent->isOnline(),
                     'last_seen_at'    => $agent->last_seen_at,
                     'upgrade_pending' => $upgradePending,
+                    'agent_version'   => $agent->agent_version,
                     'uptime_24h'      => $slots,
                     'last_report'     => $lastReport ? [
                         'status' => $lastReport->overallStatus(),

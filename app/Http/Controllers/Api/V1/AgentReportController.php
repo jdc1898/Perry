@@ -54,6 +54,10 @@ class AgentReportController extends Controller
                 $update['reported_binary_hash'] = $data['binary_hash'];
             }
 
+            if (! empty($data['version'])) {
+                $update['agent_version'] = $data['version'];
+            }
+
             $agent->update($update);
         });
 

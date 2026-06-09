@@ -144,7 +144,7 @@ const barTimeLabels: string[] = (() => {
                                                 </span>
                                             </div>
                                             <div class="text-xs text-muted-foreground">
-                                                {{ agent.hostname ?? 'Not yet connected' }} · {{ timeAgo(agent.last_seen_at) }}
+                                                {{ agent.hostname ?? 'Not yet connected' }} · {{ timeAgo(agent.last_seen_at) }}<template v-if="agent.agent_version"> · <span class="font-mono">{{ agent.agent_version }}</span></template>
                                             </div>
                                         </div>
                                     </div>

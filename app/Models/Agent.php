@@ -28,6 +28,7 @@ class Agent extends Model
         'config_version',
         'auto_update',
         'reported_binary_hash',
+        'agent_version',
         'last_seen_at',
         'alerted_offline_at',
     ];
