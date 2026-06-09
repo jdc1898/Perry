@@ -230,7 +230,7 @@ function fmtBytes(n: number): string {
                     <div v-if="recentIssues.length === 0" class="p-6 text-center text-sm text-muted-foreground">
                         No issues detected. All clear.
                     </div>
-                    <div v-else class="divide-y divide-border">
+                    <div v-else class="divide-y divide-border overflow-y-auto max-h-96">
                         <Link
                             v-for="(issue, i) in recentIssues"
                             :key="i"
