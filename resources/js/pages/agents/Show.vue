@@ -206,13 +206,13 @@ function hasAnyData(timeline: AgentTimelineDay[]): boolean {
                         <div class="w-11 shrink-0 text-right font-mono text-xs text-muted-foreground">
                             {{ formatDayLabel(day.date) }}
                         </div>
-                        <div class="flex flex-1 gap-px overflow-hidden rounded-sm min-w-0">
+                        <div class="flex flex-1 gap-px overflow-x-auto rounded-sm min-w-0">
                             <div
                                 v-for="(status, i) in day.slots"
                                 :key="i"
                                 :class="slotColor(status)"
                                 :title="`${day.date} ${slotToTime(i)} — ${status ?? 'no data'}`"
-                                class="flex-1 h-7 min-w-0"
+                                class="flex-1 min-w-px h-7"
                             />
                         </div>
                     </div>
