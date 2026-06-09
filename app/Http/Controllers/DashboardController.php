@@ -48,8 +48,8 @@ class DashboardController extends Controller
                 $slots = array_fill(0, 48, null);
                 foreach ($reports24h as $report) {
                     $minutesAgo = $since24h->diffInMinutes($report->reported_at);
-                    $slot       = (int) floor($minutesAgo / 5);
-                    if ($slot < 0 || $slot >= 48) continue;
+                    $slot       = min(47, (int) floor($minutesAgo / 5));
+                    if ($slot < 0) continue;
                     $status = $report->overallStatus();
                     $order  = ['critical' => 3, 'warning' => 2, 'ok' => 0];
                     if ($slots[$slot] === null || ($order[$status] ?? 0) > ($order[$slots[$slot]] ?? 0)) {
