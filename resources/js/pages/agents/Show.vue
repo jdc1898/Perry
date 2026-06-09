@@ -49,7 +49,7 @@ const configForm = useForm({
 
 function saveConfig() {
     configForm
-        .transform((data: typeof configForm.data) => ({
+        .transform((data) => ({
             ...data,
             system_config: {
                 ...data.system_config,

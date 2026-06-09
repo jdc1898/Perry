@@ -20,11 +20,11 @@ class WebhookChannel
         }
 
         $payload = $notification->toWebhook($notifiable);
-        $body    = json_encode($payload);
+        $body = json_encode($payload);
 
         $headers = [];
         if (! empty($channel->config['secret'])) {
-            $headers['X-Perry-Signature'] = 'sha256=' . hash_hmac('sha256', $body, $channel->config['secret']);
+            $headers['X-Perry-Signature'] = 'sha256='.hash_hmac('sha256', $body, $channel->config['secret']);
         }
 
         try {

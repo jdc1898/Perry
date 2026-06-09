@@ -18,19 +18,19 @@ class NotificationsController extends Controller
             'channels' => [
                 'mail' => [
                     'enabled' => $channels->has('mail') ? $channels->get('mail')->enabled : false,
-                    'config'  => $channels->has('mail')
+                    'config' => $channels->has('mail')
                         ? $channels->get('mail')->config
                         : ['addresses' => []],
                 ],
                 'slack' => [
                     'enabled' => $channels->has('slack') ? $channels->get('slack')->enabled : false,
-                    'config'  => $channels->has('slack')
+                    'config' => $channels->has('slack')
                         ? $channels->get('slack')->config
                         : ['webhook_url' => ''],
                 ],
                 'webhook' => [
                     'enabled' => $channels->has('webhook') ? $channels->get('webhook')->enabled : false,
-                    'config'  => $channels->has('webhook')
+                    'config' => $channels->has('webhook')
                         ? $channels->get('webhook')->config
                         : ['url' => '', 'secret' => ''],
                 ],
@@ -41,14 +41,14 @@ class NotificationsController extends Controller
     public function update(Request $request): RedirectResponse
     {
         $request->validate([
-            'mail.enabled'           => ['boolean'],
-            'mail.config.addresses'  => ['array'],
+            'mail.enabled' => ['boolean'],
+            'mail.config.addresses' => ['array'],
             'mail.config.addresses.*' => ['email'],
-            'slack.enabled'          => ['boolean'],
+            'slack.enabled' => ['boolean'],
             'slack.config.webhook_url' => ['nullable', 'url'],
-            'webhook.enabled'        => ['boolean'],
-            'webhook.config.url'     => ['nullable', 'url'],
-            'webhook.config.secret'  => ['nullable', 'string', 'max:255'],
+            'webhook.enabled' => ['boolean'],
+            'webhook.config.url' => ['nullable', 'url'],
+            'webhook.config.secret' => ['nullable', 'string', 'max:255'],
         ]);
 
         $user = $request->user();
@@ -59,7 +59,7 @@ class NotificationsController extends Controller
                 ['type' => $type],
                 [
                     'enabled' => $data['enabled'] ?? false,
-                    'config'  => $data['config'] ?? [],
+                    'config' => $data['config'] ?? [],
                 ]
             );
         }

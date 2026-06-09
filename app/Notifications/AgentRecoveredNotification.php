@@ -18,12 +18,13 @@ class AgentRecoveredNotification extends Notification
         $channels = [];
         foreach ($notifiable->notificationChannels()->where('enabled', true)->get() as $channel) {
             $channels[] = match ($channel->type) {
-                'mail'    => 'mail',
-                'slack'   => 'slack',
+                'mail' => 'mail',
+                'slack' => 'slack',
                 'webhook' => WebhookChannel::class,
-                default   => null,
+                default => null,
             };
         }
+
         return array_values(array_filter(array_unique($channels)));
     }
 
@@ -31,7 +32,7 @@ class AgentRecoveredNotification extends Notification
     {
         return (new MailMessage)
             ->subject("✅ Agent Recovered: {$this->agent->name}")
-            ->greeting("Agent Recovered")
+            ->greeting('Agent Recovered')
             ->line("**{$this->agent->name}** ({$this->agent->hostname}) is back online and reporting.")
             ->action('View Agent', url("/agents/{$this->agent->id}"));
     }
@@ -40,7 +41,7 @@ class AgentRecoveredNotification extends Notification
     {
         return (new SlackMessage)
             ->text("✅ *Agent Recovered: {$this->agent->name}*")
-            ->block(function (SectionBlock $block) {
+            ->sectionBlock(function (SectionBlock $block) {
                 $block->text("*{$this->agent->name}* (`{$this->agent->hostname}`) is back online and reporting.");
             });
     }
@@ -48,10 +49,10 @@ class AgentRecoveredNotification extends Notification
     public function toWebhook(object $notifiable): array
     {
         return [
-            'event'     => 'agent.recovered',
-            'agent'     => [
-                'id'       => $this->agent->id,
-                'name'     => $this->agent->name,
+            'event' => 'agent.recovered',
+            'agent' => [
+                'id' => $this->agent->id,
+                'name' => $this->agent->name,
                 'hostname' => $this->agent->hostname,
             ],
             'timestamp' => now()->toISOString(),

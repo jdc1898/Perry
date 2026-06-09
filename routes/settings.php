@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\BinaryController;
+use App\Http\Controllers\Binary\EditBinaryController;
+use App\Http\Controllers\Binary\UploadBinaryController;
 use App\Http\Controllers\Settings\NotificationsController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\SecurityController;
@@ -30,6 +31,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('settings/notifications', [NotificationsController::class, 'edit'])->name('notifications.edit');
     Route::put('settings/notifications', [NotificationsController::class, 'update'])->name('notifications.update');
 
-    Route::get('settings/binary', [BinaryController::class, 'edit'])->name('binary.edit');
-    Route::post('settings/binary', [BinaryController::class, 'upload'])->name('binary.upload');
+    Route::get('settings/binary', EditBinaryController::class)->name('binary.edit');
+    Route::post('settings/binary', UploadBinaryController::class)->name('binary.upload');
 });

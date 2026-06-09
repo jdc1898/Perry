@@ -3,13 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Storage;
 
 class Agent extends Model
 {
-    use HasUuids;
+    use HasFactory, HasUuids;
 
     protected $fillable = [
         'id',
@@ -34,19 +36,19 @@ class Agent extends Model
     ];
 
     protected $casts = [
-        'php_config'           => 'array',
-        'mysql_config'         => 'array',
-        'reverb_config'        => 'array',
-        'redis_config'         => 'array',
-        'system_config'        => 'array',
-        'auto_update'          => 'boolean',
-        'last_seen_at'         => 'datetime',
-        'alerted_offline_at'   => 'datetime',
+        'php_config' => 'array',
+        'mysql_config' => 'array',
+        'reverb_config' => 'array',
+        'redis_config' => 'array',
+        'system_config' => 'array',
+        'auto_update' => 'boolean',
+        'last_seen_at' => 'datetime',
+        'alerted_offline_at' => 'datetime',
     ];
 
-    public function reports(): HasMany
+    public function reports(): HasOne
     {
-        return $this->hasMany(AgentReport::class)->latestOfMany('reported_at');
+        return $this->hasOne(AgentReport::class)->latestOfMany('reported_at');
     }
 
     public function allReports(): HasMany
@@ -67,19 +69,19 @@ class Agent extends Model
     public function toRemoteConfig(): array
     {
         return [
-            'version'     => $this->config_version,
-            'revoked'     => $this->isRevoked(),
+            'version' => $this->config_version,
+            'revoked' => $this->isRevoked(),
             'auto_update' => (bool) $this->auto_update,
             'binary_hash' => $this->currentBinaryHash(),
-            'checks'      => [
-                'php'    => $this->php_config    ?? $this->defaultPhpConfig(),
-                'mysql'  => $this->mysql_config  ?? $this->defaultMysqlConfig(),
+            'checks' => [
+                'php' => $this->php_config ?? $this->defaultPhpConfig(),
+                'mysql' => $this->mysql_config ?? $this->defaultMysqlConfig(),
                 'reverb' => $this->reverb_config ?? $this->defaultReverbConfig(),
-                'redis'  => $this->redis_config  ?? $this->defaultRedisConfig(),
+                'redis' => $this->redis_config ?? $this->defaultRedisConfig(),
                 'system' => $this->system_config ?? $this->defaultSystemConfig(),
             ],
             'intervals' => [
-                'checks'      => $this->check_interval,
+                'checks' => $this->check_interval,
                 'config_poll' => $this->config_poll_interval,
             ],
         ];
@@ -88,6 +90,7 @@ class Agent extends Model
     private function currentBinaryHash(): string
     {
         $path = Storage::disk('local')->path('perry.sha256');
+
         return file_exists($path) ? trim(file_get_contents($path)) : '';
     }
 
@@ -114,12 +117,12 @@ class Agent extends Model
     private function defaultSystemConfig(): array
     {
         return [
-            'enabled'              => false,
-            'disk_paths'           => [],
-            'network_interfaces'   => [],
-            'cpu_warn_pct'         => 0,
-            'ram_warn_pct'         => 0,
-            'disk_warn_pct'        => 0,
+            'enabled' => false,
+            'disk_paths' => [],
+            'network_interfaces' => [],
+            'cpu_warn_pct' => 0,
+            'ram_warn_pct' => 0,
+            'disk_warn_pct' => 0,
         ];
     }
 }

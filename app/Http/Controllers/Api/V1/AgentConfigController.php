@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class AgentConfigController extends Controller
 {
-    public function show(Request $request, string $agentId): JsonResponse
+    public function __invoke(Request $request, string $agentId): JsonResponse
     {
         /** @var Agent $agent */
         $agent = $request->attributes->get('agent');

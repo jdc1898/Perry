@@ -1,6 +1,6 @@
 export type AgentStatus = 'pending' | 'active' | 'revoked';
 export type CheckStatus = 'ok' | 'warning' | 'critical' | 'unknown';
-export type CheckName = 'php' | 'mysql' | 'reverb' | 'redis';
+export type CheckName = 'php' | 'mysql' | 'reverb' | 'redis' | 'system';
 
 export interface Agent {
     id: string;
@@ -13,6 +13,7 @@ export interface Agent {
     check_interval: number;
     config_poll_interval: number;
     config_version: number;
+    auto_update: boolean;
     php_config: PHPConfig;
     mysql_config: MySQLConfig;
     reverb_config: ReverbConfig;

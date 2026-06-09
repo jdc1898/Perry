@@ -2,19 +2,22 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class AgentReport extends Model
 {
+    use HasFactory;
+
     public $timestamps = false;
 
     protected $fillable = ['agent_id', 'hostname', 'reported_at'];
 
     protected $casts = [
         'reported_at' => 'datetime',
-        'created_at'  => 'datetime',
+        'created_at' => 'datetime',
     ];
 
     public function agent(): BelongsTo
@@ -31,8 +34,12 @@ class AgentReport extends Model
     {
         $statuses = $this->checkResults->pluck('status')->filter(fn ($s) => $s !== 'unknown');
 
-        if ($statuses->contains('critical')) return 'critical';
-        if ($statuses->contains('warning'))  return 'warning';
+        if ($statuses->contains('critical')) {
+            return 'critical';
+        }
+        if ($statuses->contains('warning')) {
+            return 'warning';
+        }
 
         return 'ok';
     }

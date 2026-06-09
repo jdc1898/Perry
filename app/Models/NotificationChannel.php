@@ -11,7 +11,7 @@ class NotificationChannel extends Model
 
     protected $casts = [
         'enabled' => 'boolean',
-        'config'  => 'array',
+        'config' => 'array',
     ];
 
     public function user(): BelongsTo

@@ -18,12 +18,13 @@ class AgentOfflineNotification extends Notification
         $channels = [];
         foreach ($notifiable->notificationChannels()->where('enabled', true)->get() as $channel) {
             $channels[] = match ($channel->type) {
-                'mail'    => 'mail',
-                'slack'   => 'slack',
+                'mail' => 'mail',
+                'slack' => 'slack',
                 'webhook' => WebhookChannel::class,
-                default   => null,
+                default => null,
             };
         }
+
         return array_values(array_filter(array_unique($channels)));
     }
 
@@ -31,9 +32,9 @@ class AgentOfflineNotification extends Notification
     {
         return (new MailMessage)
             ->subject("🔴 Agent Offline: {$this->agent->name}")
-            ->greeting("Agent Offline")
+            ->greeting('Agent Offline')
             ->line("**{$this->agent->name}** ({$this->agent->hostname}) has stopped reporting.")
-            ->line('Last seen: ' . ($this->agent->last_seen_at?->diffForHumans() ?? 'Never'))
+            ->line('Last seen: '.($this->agent->last_seen_at?->diffForHumans() ?? 'Never'))
             ->action('View Agent', url("/agents/{$this->agent->id}"))
             ->line('You will receive another notification when the agent recovers.');
     }
@@ -42,22 +43,22 @@ class AgentOfflineNotification extends Notification
     {
         return (new SlackMessage)
             ->text("🔴 *Agent Offline: {$this->agent->name}*")
-            ->block(function (SectionBlock $block) {
-                $block->text("*{$this->agent->name}* (`{$this->agent->hostname}`) has stopped reporting.\nLast seen: " . ($this->agent->last_seen_at?->diffForHumans() ?? 'Never'));
+            ->sectionBlock(function (SectionBlock $block) {
+                $block->text("*{$this->agent->name}* (`{$this->agent->hostname}`) has stopped reporting.\nLast seen: ".($this->agent->last_seen_at?->diffForHumans() ?? 'Never'));
             });
     }
 
     public function toWebhook(object $notifiable): array
     {
         return [
-            'event'       => 'agent.offline',
-            'agent'       => [
-                'id'       => $this->agent->id,
-                'name'     => $this->agent->name,
+            'event' => 'agent.offline',
+            'agent' => [
+                'id' => $this->agent->id,
+                'name' => $this->agent->name,
                 'hostname' => $this->agent->hostname,
             ],
             'last_seen_at' => $this->agent->last_seen_at?->toISOString(),
-            'timestamp'    => now()->toISOString(),
+            'timestamp' => now()->toISOString(),
         ];
     }
 }

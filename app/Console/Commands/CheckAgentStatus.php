@@ -10,7 +10,8 @@ use Illuminate\Console\Command;
 
 class CheckAgentStatus extends Command
 {
-    protected $signature   = 'perry:check-agents';
+    protected $signature = 'perry:check-agents';
+
     protected $description = 'Send notifications for agents that go offline or recover';
 
     public function handle(): void
@@ -24,11 +25,11 @@ class CheckAgentStatus extends Command
         $wentOffline = Agent::where('status', 'active')
             ->where(function ($q) {
                 $q->whereNull('last_seen_at')
-                  ->orWhere('last_seen_at', '<', now()->subMinutes(10));
+                    ->orWhere('last_seen_at', '<', now()->subMinutes(10));
             })
             ->where(function ($q) {
                 $q->whereNull('alerted_offline_at')
-                  ->orWhereColumn('alerted_offline_at', '<', 'last_seen_at');
+                    ->orWhereColumn('alerted_offline_at', '<', 'last_seen_at');
             })
             ->get();
 

@@ -31,9 +31,9 @@ class AgentController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'id'          => ['required', 'uuid', Rule::unique('agents', 'id')],
-            'name'        => ['required', 'string', 'max:100'],
-            'public_key'  => ['required', 'string'],
+            'id' => ['required', 'uuid', Rule::unique('agents', 'id')],
+            'name' => ['required', 'string', 'max:100'],
+            'public_key' => ['required', 'string'],
             'fingerprint' => ['required', 'string', Rule::unique('agents', 'fingerprint')],
         ]);
 
@@ -46,7 +46,7 @@ class AgentController extends Controller
 
     public function show(Agent $agent): Response
     {
-        $tz   = config('app.display_timezone', 'UTC');
+        $tz = config('app.display_timezone', 'UTC');
         $days = 30;
         $since = now($tz)->subDays($days - 1)->startOfDay();
 
@@ -60,9 +60,9 @@ class AgentController extends Controller
         // Map reports to date => slot (5-min window) => worst status, in display timezone
         $byDate = [];
         foreach ($reports as $report) {
-            $local  = $report->reported_at->setTimezone($tz);
-            $date   = $local->toDateString();
-            $slot   = (int) floor(($local->hour * 60 + $local->minute) / 5);
+            $local = $report->reported_at->setTimezone($tz);
+            $date = $local->toDateString();
+            $slot = (int) floor(($local->hour * 60 + $local->minute) / 5);
             $status = $report->overallStatus();
 
             $byDate[$date][$slot] = isset($byDate[$date][$slot])
@@ -73,8 +73,8 @@ class AgentController extends Controller
         // Build timeline newest-first, all 30 days
         $timeline = [];
         for ($i = 0; $i < $days; $i++) {
-            $date   = now($tz)->subDays($i)->toDateString();
-            $slots  = array_fill(0, 288, null);
+            $date = now($tz)->subDays($i)->toDateString();
+            $slots = array_fill(0, 288, null);
             foreach ($byDate[$date] ?? [] as $slot => $status) {
                 $slots[$slot] = $status;
             }
@@ -82,7 +82,7 @@ class AgentController extends Controller
         }
 
         return Inertia::render('agents/Show', [
-            'agent'    => $this->agentDetail($agent),
+            'agent' => $this->agentDetail($agent),
             'timeline' => $timeline,
         ]);
     }
@@ -90,21 +90,22 @@ class AgentController extends Controller
     private function worstStatus(string $a, string $b): string
     {
         $order = ['critical' => 3, 'warning' => 2, 'unknown' => 1, 'ok' => 0];
+
         return ($order[$a] ?? 0) >= ($order[$b] ?? 0) ? $a : $b;
     }
 
     public function update(Request $request, Agent $agent): RedirectResponse
     {
         $data = $request->validate([
-            'name'                 => ['required', 'string', 'max:100'],
-            'check_interval'       => ['required', 'integer', 'min:10', 'max:3600'],
+            'name' => ['required', 'string', 'max:100'],
+            'check_interval' => ['required', 'integer', 'min:10', 'max:3600'],
             'config_poll_interval' => ['required', 'integer', 'min:60', 'max:3600'],
-            'auto_update'          => ['boolean'],
-            'php_config'           => ['nullable', 'array'],
-            'mysql_config'         => ['nullable', 'array'],
-            'reverb_config'        => ['nullable', 'array'],
-            'redis_config'         => ['nullable', 'array'],
-            'system_config'        => ['nullable', 'array'],
+            'auto_update' => ['boolean'],
+            'php_config' => ['nullable', 'array'],
+            'mysql_config' => ['nullable', 'array'],
+            'reverb_config' => ['nullable', 'array'],
+            'redis_config' => ['nullable', 'array'],
+            'system_config' => ['nullable', 'array'],
         ]);
 
         $agent->update(array_merge($data, [
@@ -112,15 +113,6 @@ class AgentController extends Controller
         ]));
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Configuration saved.']);
-
-        return back();
-    }
-
-    public function revoke(Agent $agent): RedirectResponse
-    {
-        $agent->update(['status' => 'revoked']);
-
-        Inertia::flash('toast', ['type' => 'success', 'message' => 'Agent revoked.']);
 
         return back();
     }
@@ -137,11 +129,11 @@ class AgentController extends Controller
     private function agentSummary(Agent $agent): array
     {
         return [
-            'id'           => $agent->id,
-            'name'         => $agent->name,
-            'hostname'     => $agent->hostname,
-            'status'       => $agent->status,
-            'is_online'    => $agent->isOnline(),
+            'id' => $agent->id,
+            'name' => $agent->name,
+            'hostname' => $agent->hostname,
+            'status' => $agent->status,
+            'is_online' => $agent->isOnline(),
             'last_seen_at' => $agent->last_seen_at,
             'report_count' => $agent->report_count,
         ];
@@ -150,23 +142,23 @@ class AgentController extends Controller
     private function agentDetail(Agent $agent): array
     {
         return [
-            'id'                   => $agent->id,
-            'name'                 => $agent->name,
-            'hostname'             => $agent->hostname,
-            'fingerprint'          => $agent->fingerprint,
-            'status'               => $agent->status,
-            'is_online'            => $agent->isOnline(),
-            'last_seen_at'         => $agent->last_seen_at,
-            'check_interval'       => $agent->check_interval,
+            'id' => $agent->id,
+            'name' => $agent->name,
+            'hostname' => $agent->hostname,
+            'fingerprint' => $agent->fingerprint,
+            'status' => $agent->status,
+            'is_online' => $agent->isOnline(),
+            'last_seen_at' => $agent->last_seen_at,
+            'check_interval' => $agent->check_interval,
             'config_poll_interval' => $agent->config_poll_interval,
-            'config_version'       => $agent->config_version,
-            'auto_update'          => (bool) $agent->auto_update,
-            'php_config'           => $agent->php_config    ?? ['enabled' => false, 'fpm_socket' => '', 'status_url' => ''],
-            'mysql_config'         => $agent->mysql_config  ?? ['enabled' => false, 'dsn' => '', 'check_replication' => false],
-            'reverb_config'        => $agent->reverb_config ?? ['enabled' => false, 'host' => '127.0.0.1', 'port' => 8080],
-            'redis_config'         => $agent->redis_config  ?? ['enabled' => false, 'addr' => '127.0.0.1:6379', 'password' => '', 'db' => 0],
-            'system_config'        => $agent->system_config ?? ['enabled' => false, 'disk_paths' => [], 'network_interfaces' => [], 'cpu_warn_pct' => 0, 'ram_warn_pct' => 0, 'disk_warn_pct' => 0],
-            'created_at'           => $agent->created_at,
+            'config_version' => $agent->config_version,
+            'auto_update' => (bool) $agent->auto_update,
+            'php_config' => $agent->php_config ?? ['enabled' => false, 'fpm_socket' => '', 'status_url' => ''],
+            'mysql_config' => $agent->mysql_config ?? ['enabled' => false, 'dsn' => '', 'check_replication' => false],
+            'reverb_config' => $agent->reverb_config ?? ['enabled' => false, 'host' => '127.0.0.1', 'port' => 8080],
+            'redis_config' => $agent->redis_config ?? ['enabled' => false, 'addr' => '127.0.0.1:6379', 'password' => '', 'db' => 0],
+            'system_config' => $agent->system_config ?? ['enabled' => false, 'disk_paths' => [], 'network_interfaces' => [], 'cpu_warn_pct' => 0, 'ram_warn_pct' => 0, 'disk_warn_pct' => 0],
+            'created_at' => $agent->created_at,
         ];
     }
 }
