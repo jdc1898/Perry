@@ -16,7 +16,7 @@ use Tests\TestCase;
 
 pest()->extend(TestCase::class)
  // ->use(RefreshDatabase::class)
-    ->in('Feature', 'Models', 'Notifications', 'Controllers', 'Commands', 'Providers', 'Actions');
+    ->in('Feature', 'Models', 'Notifications', 'Controllers', 'Commands', 'Providers', 'Actions', 'Browser');
 
 uses()->group('models')->in('Models');
 uses()->group('notifications')->in('Notifications');
