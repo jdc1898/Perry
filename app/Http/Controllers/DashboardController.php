@@ -23,33 +23,32 @@ class DashboardController extends Controller
             'online'   => $agents->filter(fn (Agent $a) => $a->isOnline())->count(),
         ];
 
-        $since24h = now()->subHours(4);
-
         $serverBinaryHash = $this->serverBinaryHash();
 
         // Last report per agent with overall status
         $agentStatuses = Agent::where('status', '!=', 'revoked')
             ->orderBy('name')
             ->get()
-            ->map(function (Agent $agent) use ($since24h, $serverBinaryHash) {
+            ->map(function (Agent $agent) use ($serverBinaryHash) {
                 $lastReport = AgentReport::where('agent_id', $agent->id)
                     ->with('checkResults')
                     ->orderByDesc('reported_at')
                     ->first();
 
                 // 4h uptime: 48 five-minute slots
+                // Use MySQL NOW() to avoid PHP/Carbon timezone mismatches
                 $reports24h = AgentReport::where('agent_id', $agent->id)
-                    ->with('checkResults:report_id,status')
-                    ->where('reported_at', '>=', $since24h)
+                    ->with('checkResults:id,report_id,status')
+                    ->whereRaw('reported_at >= NOW() - INTERVAL 4 HOUR')
                     ->select(['id', 'reported_at'])
                     ->orderBy('reported_at')
                     ->get();
 
+                $now   = now();
                 $slots = array_fill(0, 48, null);
                 foreach ($reports24h as $report) {
-                    $minutesAgo = $since24h->diffInMinutes($report->reported_at);
-                    $slot       = min(47, (int) floor($minutesAgo / 5));
-                    if ($slot < 0) continue;
+                    $minutesAgo = (int) $now->diffInMinutes($report->reported_at);
+                    $slot       = min(47, max(0, 47 - (int) floor($minutesAgo / 5)));
                     $status = $report->overallStatus();
                     $order  = ['critical' => 3, 'warning' => 2, 'ok' => 0];
                     if ($slots[$slot] === null || ($order[$status] ?? 0) > ($order[$slots[$slot]] ?? 0)) {
