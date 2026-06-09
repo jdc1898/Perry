@@ -19,9 +19,10 @@ class AgentReportController extends Controller
 
         $data = $request->json()->all();
 
+        // Always normalise to UTC so DB comparisons work regardless of agent timezone
         $reportedAt = isset($data['timestamp'])
-            ? \Carbon\Carbon::parse($data['timestamp'])
-            : now();
+            ? \Carbon\Carbon::parse($data['timestamp'])->utc()
+            : now()->utc();
 
         DB::transaction(function () use ($agent, $data, $reportedAt) {
             $report = AgentReport::create([
@@ -39,7 +40,7 @@ class AgentReportController extends Controller
                     'message'    => $check['message'] ?? '',
                     'metrics'    => $check['metrics'] ?? null,
                     'checked_at' => isset($check['timestamp'])
-                        ? \Carbon\Carbon::parse($check['timestamp'])
+                        ? \Carbon\Carbon::parse($check['timestamp'])->utc()
                         : $reportedAt,
                 ]);
             }
