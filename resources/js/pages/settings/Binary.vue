@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { edit } from '@/routes/binary';
 
-const props = defineProps<{
+defineProps<{
     binary: {
         exists: boolean;
         size: number | null;
