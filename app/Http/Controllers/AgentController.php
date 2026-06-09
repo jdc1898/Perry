@@ -46,8 +46,9 @@ class AgentController extends Controller
 
     public function show(Agent $agent): Response
     {
-        $days  = 30;
-        $since = now()->subDays($days - 1)->startOfDay();
+        $tz   = config('app.display_timezone', 'UTC');
+        $days = 30;
+        $since = now($tz)->subDays($days - 1)->startOfDay();
 
         $reports = $agent->allReports()
             ->with(['checkResults:report_id,status'])
@@ -56,11 +57,12 @@ class AgentController extends Controller
             ->orderBy('reported_at')
             ->get();
 
-        // Map reports to date => slot (5-min window) => worst status
+        // Map reports to date => slot (5-min window) => worst status, in display timezone
         $byDate = [];
         foreach ($reports as $report) {
-            $date   = $report->reported_at->toDateString();
-            $slot   = (int) floor(($report->reported_at->hour * 60 + $report->reported_at->minute) / 5);
+            $local  = $report->reported_at->setTimezone($tz);
+            $date   = $local->toDateString();
+            $slot   = (int) floor(($local->hour * 60 + $local->minute) / 5);
             $status = $report->overallStatus();
 
             $byDate[$date][$slot] = isset($byDate[$date][$slot])
@@ -71,7 +73,7 @@ class AgentController extends Controller
         // Build timeline newest-first, all 30 days
         $timeline = [];
         for ($i = 0; $i < $days; $i++) {
-            $date   = now()->subDays($i)->toDateString();
+            $date   = now($tz)->subDays($i)->toDateString();
             $slots  = array_fill(0, 288, null);
             foreach ($byDate[$date] ?? [] as $slot => $status) {
                 $slots[$slot] = $status;
