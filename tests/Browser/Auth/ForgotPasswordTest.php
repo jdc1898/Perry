@@ -16,8 +16,10 @@ it('shows an email field', function () {
 });
 
 it('sends a password reset link', function () {
+    \App\Models\User::factory()->create(['email' => 'test@example.com']);
+
     visit('/forgot-password')
         ->type('email', 'test@example.com')
-        ->submit()
-        ->assertSee('sent');
+        ->click('@email-password-reset-link-button')
+        ->assertSee('emailed');
 });

@@ -18,10 +18,9 @@ it('shows the security settings page after confirming password', function () {
         ->type('password', 'password')
         ->submit();
 
-    // Security page requires password confirmation — confirm first
-    visit('/confirm-password')
+    visit('/user/confirm-password')
         ->type('password', 'password')
-        ->submit();
+        ->click('@confirm-password-button');
 
     visit('/settings/security')
         ->assertPathIs('/settings/security')

@@ -7,7 +7,7 @@ uses(RefreshDatabase::class);
 it('shows the welcome page', function () {
     visit('/')
         ->assertPathIs('/')
-        ->assertTitleContains('Perry');
+        ->assertTitleContains('Welcome');
 });
 
 it('shows a link to log in', function () {

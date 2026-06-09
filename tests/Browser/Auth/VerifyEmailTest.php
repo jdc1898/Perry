@@ -5,14 +5,19 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-it('shows the email verification page for unverified users', function () {
+it('shows the email verification page when visited directly', function () {
     $user = User::factory()->unverified()->create();
 
+    // Log in first (MustVerifyEmail is not enforced, so login succeeds normally)
     visit('/login')
         ->type('email', $user->email)
         ->type('password', 'password')
         ->submit()
-        ->assertPathIs('/verify-email')
+        ->assertPathIs('/dashboard');
+
+    // Visit the email verification notice page directly
+    visit('/email/verify')
+        ->assertPathIs('/email/verify')
         ->assertSee('verification');
 });
 
@@ -22,6 +27,8 @@ it('shows resend verification email button', function () {
     visit('/login')
         ->type('email', $user->email)
         ->type('password', 'password')
-        ->submit()
+        ->submit();
+
+    visit('/email/verify')
         ->assertSee('Resend verification email');
 });
