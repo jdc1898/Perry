@@ -79,7 +79,7 @@ export interface AgentSummary {
     uptime_24h: Array<CheckStatus | null>;
     last_report: {
         status: CheckStatus;
-        checks: Array<{ name: CheckName; status: CheckStatus; message: string }>;
+        checks: Array<{ name: CheckName; status: CheckStatus; message: string; metrics: Record<string, number> | null }>;
     } | null;
 }
 

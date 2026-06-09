@@ -47,6 +47,32 @@ const barTimeLabels: string[] = (() => {
         return hoursAgo === 0 ? 'Now' : t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
     });
 })();
+
+function systemMetrics(agent: AgentSummary): string | null {
+    const sys = agent.last_report?.checks.find(c => c.name === 'system');
+    const m = sys?.metrics;
+    if (!m) return null;
+
+    const parts: string[] = [];
+    if (m.cpu_usage_pct != null) parts.push(`CPU ${m.cpu_usage_pct.toFixed(1)}%`);
+    if (m.ram_used_pct != null) parts.push(`RAM ${m.ram_used_pct.toFixed(1)}%`);
+    if (m.disk_root_used_pct != null) parts.push(`Disk ${m.disk_root_used_pct.toFixed(1)}%`);
+
+    const netKeys = Object.keys(m).filter(k => k.endsWith('_bytes_sent_per_sec'));
+    if (netKeys.length > 0) {
+        const sent = netKeys.reduce((sum, k) => sum + (m[k] ?? 0), 0);
+        const recv = netKeys.reduce((sum, k) => sum + (m[k.replace('sent', 'recv')] ?? 0), 0);
+        parts.push(`↑${fmtBytes(sent)} ↓${fmtBytes(recv)}`);
+    }
+
+    return parts.length > 0 ? parts.join(' · ') : null;
+}
+
+function fmtBytes(n: number): string {
+    if (n < 1024) return `${n}B/s`;
+    if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)}KB/s`;
+    return `${(n / 1024 / 1024).toFixed(1)}MB/s`;
+}
 </script>
 
 <template>
@@ -164,6 +190,10 @@ const barTimeLabels: string[] = (() => {
                                             {{ check.name }}
                                         </span>
                                     </div>
+                                </div>
+                                <!-- System metrics -->
+                                <div v-if="systemMetrics(agent)" class="text-xs text-muted-foreground font-mono">
+                                    {{ systemMetrics(agent) }}
                                 </div>
                                 <!-- 4h uptime bars — 48 × 5-min slots, full width -->
                                 <div class="flex items-end gap-px h-5 w-full">

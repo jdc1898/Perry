@@ -76,6 +76,7 @@ class DashboardController extends Controller
                             'name'    => $c->name,
                             'status'  => $c->status,
                             'message' => $c->message,
+                            'metrics' => $c->metrics,
                         ]),
                     ] : null,
                 ];
