@@ -165,6 +165,7 @@ class AgentController extends Controller
             'mysql_config'         => $agent->mysql_config  ?? ['enabled' => false, 'dsn' => '', 'check_replication' => false],
             'reverb_config'        => $agent->reverb_config ?? ['enabled' => false, 'host' => '127.0.0.1', 'port' => 8080],
             'redis_config'         => $agent->redis_config  ?? ['enabled' => false, 'addr' => '127.0.0.1:6379', 'password' => '', 'db' => 0],
+            'system_config'        => $agent->system_config ?? ['enabled' => false, 'disk_paths' => [], 'network_interfaces' => [], 'cpu_warn_pct' => 0, 'ram_warn_pct' => 0, 'disk_warn_pct' => 0],
             'created_at'           => $agent->created_at,
         ];
     }

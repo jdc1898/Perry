@@ -9,7 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { dashboard } from '@/routes';
-import type { Agent, AgentTimelineDay, CheckStatus } from '@/types/agents';
+import type { Agent, AgentTimelineDay, CheckStatus, SystemConfig } from '@/types/agents';
 
 defineOptions({
     layout: {
@@ -27,6 +27,7 @@ const props = defineProps<{
 
 const activeTab = ref<'reports' | 'config'>('reports');
 
+const sc = props.agent.system_config;
 const configForm = useForm({
     name:                 props.agent.name,
     check_interval:       props.agent.check_interval,
@@ -36,10 +37,27 @@ const configForm = useForm({
     mysql_config:         { ...props.agent.mysql_config },
     reverb_config:        { ...props.agent.reverb_config },
     redis_config:         { ...props.agent.redis_config },
+    system_config: {
+        enabled:            sc.enabled,
+        disk_paths:         sc.disk_paths.join(', ') || '/',
+        network_interfaces: sc.network_interfaces.join(', '),
+        cpu_warn_pct:       sc.cpu_warn_pct,
+        ram_warn_pct:       sc.ram_warn_pct,
+        disk_warn_pct:      sc.disk_warn_pct,
+    },
 });
 
 function saveConfig() {
-    configForm.put(`/agents/${props.agent.id}`);
+    configForm
+        .transform((data: typeof configForm.data) => ({
+            ...data,
+            system_config: {
+                ...data.system_config,
+                disk_paths:         String(data.system_config.disk_paths).split(',').map((s: string) => s.trim()).filter(Boolean),
+                network_interfaces: String(data.system_config.network_interfaces).split(',').map((s: string) => s.trim()).filter(Boolean),
+            } as SystemConfig,
+        }))
+        .put(`/agents/${props.agent.id}`);
 }
 
 function revokeAgent() {
@@ -369,6 +387,51 @@ function hasAnyData(timeline: AgentTimelineDay[]): boolean {
                                 <Label>Database</Label>
                                 <Input v-model.number="configForm.redis_config.db" type="number" min="0" max="15" placeholder="0" />
                             </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <!-- System -->
+                <Card>
+                    <CardHeader>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <CardTitle class="text-base">System</CardTitle>
+                                <CardDescription>Monitor CPU, RAM, disk, and network</CardDescription>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox id="system_enabled" v-model="configForm.system_config.enabled" />
+                                <Label for="system_enabled" class="cursor-pointer">Enabled</Label>
+                            </div>
+                        </div>
+                    </CardHeader>
+                    <CardContent v-if="configForm.system_config.enabled" class="space-y-4">
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="space-y-1.5">
+                                <Label>CPU Warn %</Label>
+                                <Input v-model.number="configForm.system_config.cpu_warn_pct" type="number" min="0" max="100" placeholder="0" />
+                                <p class="text-xs text-muted-foreground">0 = disabled</p>
+                            </div>
+                            <div class="space-y-1.5">
+                                <Label>RAM Warn %</Label>
+                                <Input v-model.number="configForm.system_config.ram_warn_pct" type="number" min="0" max="100" placeholder="0" />
+                                <p class="text-xs text-muted-foreground">0 = disabled</p>
+                            </div>
+                            <div class="space-y-1.5">
+                                <Label>Disk Warn %</Label>
+                                <Input v-model.number="configForm.system_config.disk_warn_pct" type="number" min="0" max="100" placeholder="0" />
+                                <p class="text-xs text-muted-foreground">0 = disabled</p>
+                            </div>
+                        </div>
+                        <div class="space-y-1.5">
+                            <Label>Disk Paths</Label>
+                            <Input v-model="configForm.system_config.disk_paths" placeholder="/, /data" />
+                            <p class="text-xs text-muted-foreground">Comma-separated mount points to check. Defaults to /</p>
+                        </div>
+                        <div class="space-y-1.5">
+                            <Label>Network Interfaces</Label>
+                            <Input v-model="configForm.system_config.network_interfaces" placeholder="eth0, ens3" />
+                            <p class="text-xs text-muted-foreground">Comma-separated interfaces. Leave blank to report all non-loopback.</p>
                         </div>
                     </CardContent>
                 </Card>

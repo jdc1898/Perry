@@ -17,6 +17,7 @@ export interface Agent {
     mysql_config: MySQLConfig;
     reverb_config: ReverbConfig;
     redis_config: RedisConfig;
+    system_config: SystemConfig;
     created_at: string;
     report_count?: number;
 }
@@ -44,6 +45,15 @@ export interface RedisConfig {
     addr: string;
     password: string;
     db: number;
+}
+
+export interface SystemConfig {
+    enabled: boolean;
+    disk_paths: string[];
+    network_interfaces: string[];
+    cpu_warn_pct: number;
+    ram_warn_pct: number;
+    disk_warn_pct: number;
 }
 
 export interface AgentReport {
